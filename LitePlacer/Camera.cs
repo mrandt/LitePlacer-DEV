@@ -101,8 +101,10 @@ namespace LitePlacer
 		public int FrameSizeX { get; set; }
 		public int FrameSizeY { get; set; }
 
-		private string MonikerString = "unconnected";
+		public string MonikerString = "unconnected";
 		private string Id = "unconnected";
+
+        public bool ReceivingFrames { get; set; }
 
 		public bool Start(string cam, int DeviceNo)
 		{
@@ -125,15 +127,39 @@ namespace LitePlacer
 			    PauseProcessing = false;
 
 			    VideoSource.NewFrame += new NewFrameEventHandler(Video_NewFrame);
-			    VideoSource.Start();
-			    if (VideoSource.IsRunning)
-			    {
-				    return true;
-			    }
-			    else
-			    {
-				    return false;
-			    }
+                ReceivingFrames = false;
+
+                // try ten times to start
+                int tries = 0;
+
+                while (tries < 60)  // 3 s maximum to a camera to start
+                {
+                    // VideoSource.Start() checks running status, is safe to call multiple times
+                    tries++;
+			        VideoSource.Start();
+                    if (!ReceivingFrames)
+                    {
+                        // 50 ms pause, processing events so that videosource has a chance
+                        for (int i = 0; i < 10; i++)
+                        {
+                            Thread.Sleep(5);
+                            Application.DoEvents();     
+                        }
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+                MainForm.DisplayText("*** Camera start: " + tries.ToString() + ", " + ReceivingFrames.ToString(), KnownColor.Purple);
+                // another pause so that if we are receiveing frames, we have time to notice it
+                for (int i = 0; i < 10; i++)
+                {
+                    Thread.Sleep(5);
+                    Application.DoEvents();
+                }
+
+                return (ReceivingFrames);
             }
             catch
             {
@@ -348,7 +374,7 @@ namespace LitePlacer
 			bool pause = PauseProcessing;
 			if (VideoSource != null)
 			{
-				if (VideoSource.IsRunning)
+                if (ReceivingFrames)
 				{
 					// stop video
 					PauseProcessing = true;  // ask for stop
@@ -384,10 +410,27 @@ namespace LitePlacer
 		{
 			// Take a snapshot:
 			CopyFrame = true;
-			do
-			{
+            int tries = 100;
+            while (tries>0)
+	        {
+	            tries--;
+                if (!CopyFrame)
+	            {
+		             break;
+	            }
 				Thread.Sleep(10);
-			} while (CopyFrame);
+                Application.DoEvents();
+	        }
+            if (CopyFrame)
+            {
+                // failed!
+                Graphics g = Graphics.FromImage(TemporaryFrame);
+                g.Clear(Color.Black);
+                g.Dispose();
+                MainForm.DisplayText("*** GetMeasurementFrame() failed!", KnownColor.Purple);
+                return TemporaryFrame;
+            }
+
 			if (MeasurementFunctions != null)
 			{
 				foreach (AForgeFunction f in MeasurementFunctions)
@@ -548,60 +591,80 @@ namespace LitePlacer
 		}
 
 
-		// ==========================================================================================================
-		// Eventhandler if new frame is ready
-		// ==========================================================================================================
-		// Each frame goes through Video_NewFrame
+        // ==========================================================================================================
+        // ==========================================================================================================
+
+        // Each frame goes through Video_NewFrame()
+
+        // ==========================================================================================================
+        // ==========================================================================================================
+
+        Bitmap frame;
 		private void Video_NewFrame(object sender, NewFrameEventArgs eventArgs)
 		{
-			Bitmap frame = (Bitmap)eventArgs.Frame.Clone();
-			if (CopyFrame)
-			{
-				TemporaryFrame = (Bitmap)frame.Clone();
-				CopyFrame = false;
-			};
-			if (PauseProcessing)
-			{
-				paused = true;
-				return;
-			};
+            ReceivingFrames = true;
+            frame = (Bitmap)eventArgs.Frame.Clone();
+            if (CopyFrame)
+            {
+                TemporaryFrame = (Bitmap)frame.Clone();
+                CopyFrame = false;
+            };
+
+            if (PauseProcessing)
+            {
+                //if (ImageBox.Image != null)
+                //{
+                //    ImageBox.Image.Dispose();
+                //}
+                frame.Dispose();
+                paused = true;
+                return;
+            };
+
             if (!Active)
             {
+                //if (ImageBox.Image != null)
+                //{
+                //    ImageBox.Image.Dispose();
+                //}
+                //ImageBox.Image = (Bitmap)frame.Clone();
+                frame.Dispose();
                 return;
             }
 
-			if (DisplayFunctions != null)
-			{
-				foreach (AForgeFunction f in DisplayFunctions)
-				{
-					f.func(ref frame, f.parameter_int, f.parameter_double, f.R, f.B, f.G);
-				}
-			}
 
-			if (FindCircles)
-			{
-				DrawCirclesFunct(frame);
-			};
+            if (DisplayFunctions != null)
+            {
+                foreach (AForgeFunction f in DisplayFunctions)
+                {
+                    f.func(ref frame, f.parameter_int, f.parameter_double, f.R, f.B, f.G);
+                }
+            }
 
-			if (FindRectangles)
-			{
-				frame = DrawRectanglesFunct(frame);
-			};
+            if (FindCircles)
+            {
+                DrawCirclesFunct(frame);
+            };
 
-			if (FindComponent)
-			{
-				frame = DrawComponentsFunct(frame);
-			};
+            if (FindRectangles)
+            {
+                frame = DrawRectanglesFunct(frame);
+            };
 
-			if (Draw_Snapshot)
-			{
-				frame = Draw_SnapshotFunct(frame);
-			};
+            if (FindComponent)
+            {
+                frame = DrawComponentsFunct(frame);
+            };
 
-			if (Mirror)
-			{
-				frame = MirrorFunct(frame);
-			};
+            if (Draw_Snapshot)
+            {
+                frame = Draw_SnapshotFunct(frame);
+            };
+
+            if (Mirror)
+            {
+                frame = MirrorFunct(frame);
+            };
 
             if (DrawBox)
             {
@@ -609,33 +672,37 @@ namespace LitePlacer
             };
 
             if (Zoom)
-			{
-				ZoomFunct(ref frame, ZoomFactor);
-			};
+            {
+                ZoomFunct(ref frame, ZoomFactor);
+            };
 
-			if (DrawCross) 
-			{
-				DrawCrossFunct(ref frame);
-			};
+            if (DrawCross)
+            {
+                DrawCrossFunct(ref frame);
+            };
 
-			if (DrawSidemarks) 
-			{
-				DrawSidemarksFunct(ref frame);
-			};
+            if (DrawSidemarks)
+            {
+                DrawSidemarksFunct(ref frame);
+            };
 
-			if (DrawDashedCross)
-			{
-				DrawDashedCrossFunct(frame);
-			};
+            if (DrawDashedCross)
+            {
+                DrawDashedCrossFunct(frame);
+            };
 
             if (DrawArrow)
             {
                 DrawArrowFunct(frame);
             };
 
-			ImageBox.Image = frame;
-			// frame.Dispose();
-		} // end Video_NewFrame
+            if (ImageBox.Image != null)
+            {
+                ImageBox.Image.Dispose();
+            }
+            ImageBox.Image = (Bitmap)frame.Clone();
+            frame.Dispose();
+        } // end Video_NewFrame
 
 		// ==========================================================================================================
 		// Functions compatible with lists:
@@ -1034,7 +1101,9 @@ namespace LitePlacer
         // A to rotation in degrees, 
         // return value is number of components found
 		{
-			List<Shapes.Component> RawComponents = FindComponentsFunct(GetMeasurementFrame());
+            Bitmap image = GetMeasurementFrame();
+            List<Shapes.Component> RawComponents = FindComponentsFunct(image);
+            image.Dispose();
 			List<Shapes.Component> GoodComponents = new List<Shapes.Component>();
 
 			X = 0.0;
@@ -1140,7 +1209,10 @@ namespace LitePlacer
 		// Sets X, Y position of the closest circle to the frame center in pixels, return value is number of circles found
 		{
 			List<Shapes.Circle> GoodCircles = new List<Shapes.Circle>();
-			List<Shapes.Circle> RawCircles = FindCirclesFunct(GetMeasurementFrame());
+            Bitmap image = GetMeasurementFrame();
+			List<Shapes.Circle> RawCircles = FindCirclesFunct(image);
+            image.Dispose();
+
 			X = 0.0;
 			Y = 0.0;
 			if (RawCircles.Count == 0)

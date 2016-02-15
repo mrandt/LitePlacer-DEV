@@ -3,6 +3,7 @@ using System.IO.Ports;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Drawing;
 using System.Windows.Forms;
 using System.Threading;
 using System.Globalization;
@@ -220,12 +221,21 @@ namespace LitePlacer
         private double SlackCompensationDistance = 0.4;
 
         public bool SlackCompensationA { get; set; }
-        private double SlackCompensationDistanceA = 10;
+        private double SlackCompensationDistanceA = 5.0;
 
         public string SmallMovementString = "G1 F200 ";
 
         public void XY(double X, double Y)
         {
+            double dX = Math.Abs(X - CurrentX);
+            double dY = Math.Abs(Y - CurrentY);
+            if ((dX < 0.004) && (dY < 0.004))
+            {
+                MainForm.DisplayText(" -- zero XY movement command --", KnownColor.Gray);
+                MainForm.DisplayText("ReadyEvent: zero movement command", KnownColor.Gray);
+                _readyEvent.Set();
+                return;   // already there
+            }
             if ((!SlackCompensation)
                 ||
                 ((CurrentX < X) && (CurrentY < Y))
@@ -247,8 +257,8 @@ namespace LitePlacer
             double dY = Math.Abs(Y - CurrentY);
             if ((dX < 0.004) && (dY < 0.004))
             {
-                MainForm.DisplayText(" -- zero XY movement command --");
-                MainForm.DisplayText("ReadyEvent: zero movement command");
+                MainForm.DisplayText(" -- zero XY movement command --", KnownColor.Gray);
+                MainForm.DisplayText("ReadyEvent: zero movement command", KnownColor.Gray);
                 _readyEvent.Set();
                 return;   // already there
             }
@@ -314,43 +324,38 @@ namespace LitePlacer
             double dA = Math.Abs(Am - CurrentA);
             if ((dX < 0.004) && (dY < 0.004) && (dA < 0.01))
             {
-                MainForm.DisplayText(" -- zero XYA movement command --");
-                MainForm.DisplayText("ReadyEvent: zero movement command");
+                MainForm.DisplayText(" -- zero XYA movement command --", KnownColor.Gray);
+                MainForm.DisplayText("ReadyEvent: zero movement command", KnownColor.Gray);
                 _readyEvent.Set();
                 return;   // already there
             }
-            if (((dX > 1) && (dY > 1)) && (dA > 5))
+
+            if ((dX < 1.0) && (dY < 1.0))
+            {
+                // small movement
+                X = X + SquareCorrection * Y;
+                command = SmallMovementString + "X" + X.ToString(CultureInfo.InvariantCulture) +
+                                                    " Y" + Y.ToString(CultureInfo.InvariantCulture);
+                _readyEvent.Reset();
+                MainForm.DisplayText(command);
+                Com.Write("{\"gc\":\"" + command + "\"}");
+
+                command = "G0 " + " A" + Am.ToString(CultureInfo.InvariantCulture);
+                Com.Write("{\"gc\":\"" + command + "\"}");
+
+                _readyEvent.Wait();
+            }
+            else
             {
                 // normal case
-				X = X + SquareCorrection * Y;
-				command = "G0 " + "X" + X.ToString(CultureInfo.InvariantCulture) +
+                X = X + SquareCorrection * Y;
+                command = "G0 " + "X" + X.ToString(CultureInfo.InvariantCulture) +
                                   " Y" + Y.ToString(CultureInfo.InvariantCulture) +
                                   " A" + Am.ToString(CultureInfo.InvariantCulture);
                 _readyEvent.Reset();
                 MainForm.DisplayText(command);
                 Com.Write("{\"gc\":\"" + command + "\"}");
                 _readyEvent.Wait();
-            }
-            else
-            {
-                // either XY or A (or both) is a small movement
-				X = X + SquareCorrection * Y;
-				if ((dX < 1.1) && (dY < 1.1))
-                {
-                    command = SmallMovementString + "X" + X.ToString(CultureInfo.InvariantCulture) + 
-                                                    " Y" + Y.ToString(CultureInfo.InvariantCulture) + " A" + Am.ToString(CultureInfo.InvariantCulture);
-                }
-                else
-                {
-                    command = "G0 " + "X" + X.ToString(CultureInfo.InvariantCulture) + 
-                                     " Y" + Y.ToString(CultureInfo.InvariantCulture) + " A" + Am.ToString(CultureInfo.InvariantCulture);
-                }
-                _readyEvent.Reset();
-                //Com.Write(command);
-                MainForm.DisplayText(command);
-                Com.Write("{\"gc\":\"" + command + "\"}");
-                _readyEvent.Wait();
-                // A(Am);
             }
         }
 
@@ -401,14 +406,15 @@ namespace LitePlacer
         private void A_move(double A)
         {
             string command;
-            if (Math.Abs(A - CurrentA) < 5)
-            {
-                command = "G1 F3000 A" + A.ToString(CultureInfo.InvariantCulture);
-            }
-            else
-            {
-                command = "G0 A" + A.ToString(CultureInfo.InvariantCulture);
-            }
+            //if (Math.Abs(A - CurrentA) < 5)
+            //{
+            //    command = "G1 F3000 A" + A.ToString(CultureInfo.InvariantCulture);
+            //}
+            //else
+            //{
+            //    command = "G0 A" + A.ToString(CultureInfo.InvariantCulture);
+            //}
+            command = "G0 A" + A.ToString(CultureInfo.InvariantCulture);
             _readyEvent.Reset();
             MainForm.DisplayText(command);
             Com.Write("{\"gc\":\"" + command + "\"}");
