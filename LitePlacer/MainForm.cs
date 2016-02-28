@@ -125,21 +125,42 @@ namespace LitePlacer
             string path = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None).FilePath;
             int i = path.LastIndexOf('\\');
             path = path.Remove(i + 1);
-            LoadDataGrid(path + "LitePlacer.ComponentData", ComponentData_dataGridView);
+            // LoadDataGrid(path + "LitePlacer.ComponentData", ComponentData_dataGridView);
             LoadDataGrid(path + "LitePlacer.TapesData", Tapes_dataGridView);
             LoadDataGrid(path + "LitePlacer.CustomTapes", CustomTapes_dataGridView);
             Tapes.AddCustomTapesToTapes();
+            Tapes.AddWidthValues();
 
-            LoadDataGrid(path + "LitePlacer.HomingFunctions", Homing_dataGridView);
-            LoadDataGrid(path + "LitePlacer.FiducialsFunctions", Fiducials_dataGridView);
-            LoadDataGrid(path + "LitePlacer.ComponentsFunctions", Components_dataGridView);
-            LoadDataGrid(path + "LitePlacer.PaperTapeFunctions", PaperTape_dataGridView);
-            LoadDataGrid(path + "LitePlacer.BlackTapeFunctions", BlackTape_dataGridView);
-            LoadDataGrid(path + "LitePlacer.ClearTapeFunctions", ClearTape_dataGridView);
-            LoadDataGrid(path + "LitePlacer.SnapshotFunctions", DowncamSnapshot_dataGridView);
-            LoadDataGrid(path + "LitePlacer.NeedleFunctions", Needle_dataGridView);
-            LoadDataGrid(path + "LitePlacer.UpCamComponentsFunctions", UpCamComponents_dataGridView);
-            LoadDataGrid(path + "LitePlacer.UpCamSnapshotFunctions", UpcamSnapshot_dataGridView);
+            // 
+            LoadDataGrid(path + "LitePlacer.HomingFunctions", Temp_dataGridView);
+            DataGridViewCopy(Temp_dataGridView, ref Homing_dataGridView, false);
+
+            LoadDataGrid(path + "LitePlacer.FiducialsFunctions", Temp_dataGridView);
+            DataGridViewCopy(Temp_dataGridView, ref Fiducials_dataGridView, false);
+
+            LoadDataGrid(path + "LitePlacer.ComponentsFunctions", Temp_dataGridView);
+            DataGridViewCopy(Temp_dataGridView, ref Components_dataGridView, false);
+
+            LoadDataGrid(path + "LitePlacer.PaperTapeFunctions", Temp_dataGridView);
+            DataGridViewCopy(Temp_dataGridView, ref PaperTape_dataGridView, false);
+
+            LoadDataGrid(path + "LitePlacer.BlackTapeFunctions", Temp_dataGridView);
+            DataGridViewCopy(Temp_dataGridView, ref BlackTape_dataGridView, false);
+
+            LoadDataGrid(path + "LitePlacer.ClearTapeFunctions", Temp_dataGridView);
+            DataGridViewCopy(Temp_dataGridView, ref ClearTape_dataGridView, false);
+
+            LoadDataGrid(path + "LitePlacer.SnapshotFunctions", Temp_dataGridView);
+            DataGridViewCopy(Temp_dataGridView, ref DowncamSnapshot_dataGridView, false);
+
+            LoadDataGrid(path + "LitePlacer.NeedleFunctions", Temp_dataGridView);
+            DataGridViewCopy(Temp_dataGridView, ref Needle_dataGridView, false);
+
+            LoadDataGrid(path + "LitePlacer.UpCamComponentsFunctions", Temp_dataGridView);
+            DataGridViewCopy(Temp_dataGridView, ref UpCamComponents_dataGridView, false);
+
+            LoadDataGrid(path + "LitePlacer.UpCamSnapshotFunctions", Temp_dataGridView);
+            DataGridViewCopy(Temp_dataGridView, ref UpcamSnapshot_dataGridView, false);
 
             SetProcessingFunctions(Display_dataGridView);
             SetProcessingFunctions(Homing_dataGridView);
@@ -368,16 +389,36 @@ namespace LitePlacer
             SaveDataGrid(path + "LitePlacer.ComponentData", ComponentData_dataGridView);
             SaveDataGrid(path + "LitePlacer.TapesData", Tapes_dataGridView);
             SaveDataGrid(path + "LitePlacer.CustomTapes", CustomTapes_dataGridView);
-            SaveDataGrid(path + "LitePlacer.HomingFunctions", Homing_dataGridView);
-            SaveDataGrid(path + "LitePlacer.FiducialsFunctions", Fiducials_dataGridView);
-            SaveDataGrid(path + "LitePlacer.ComponentsFunctions", Components_dataGridView);
-            SaveDataGrid(path + "LitePlacer.PaperTapeFunctions", PaperTape_dataGridView);
-            SaveDataGrid(path + "LitePlacer.BlackTapeFunctions", BlackTape_dataGridView);
-            SaveDataGrid(path + "LitePlacer.ClearTapeFunctions", ClearTape_dataGridView);
-            SaveDataGrid(path + "LitePlacer.SnapshotFunctions", DowncamSnapshot_dataGridView);
-            SaveDataGrid(path + "LitePlacer.NeedleFunctions", Needle_dataGridView);
-            SaveDataGrid(path + "LitePlacer.UpCamComponentsFunctions", UpCamComponents_dataGridView);
-            SaveDataGrid(path + "LitePlacer.UpCamSnapshotFunctions", UpcamSnapshot_dataGridView);
+
+            DataGridViewCopy(Homing_dataGridView, ref Temp_dataGridView, false);
+            SaveDataGrid(path + "LitePlacer.HomingFunctions", Temp_dataGridView);
+
+            DataGridViewCopy(Fiducials_dataGridView, ref Temp_dataGridView, false);
+            SaveDataGrid(path + "LitePlacer.FiducialsFunctions", Temp_dataGridView);
+
+            DataGridViewCopy(Components_dataGridView, ref Temp_dataGridView, false);
+            SaveDataGrid(path + "LitePlacer.ComponentsFunctions", Temp_dataGridView);
+
+            DataGridViewCopy(PaperTape_dataGridView, ref Temp_dataGridView, false);
+            SaveDataGrid(path + "LitePlacer.PaperTapeFunctions", Temp_dataGridView);
+
+            DataGridViewCopy(BlackTape_dataGridView, ref Temp_dataGridView, false);
+            SaveDataGrid(path + "LitePlacer.BlackTapeFunctions", Temp_dataGridView);
+
+            DataGridViewCopy(ClearTape_dataGridView, ref Temp_dataGridView, false);
+            SaveDataGrid(path + "LitePlacer.ClearTapeFunctions", Temp_dataGridView);
+
+            DataGridViewCopy(DowncamSnapshot_dataGridView, ref Temp_dataGridView, false);
+            SaveDataGrid(path + "LitePlacer.SnapshotFunctions", Temp_dataGridView);
+
+            DataGridViewCopy(Needle_dataGridView, ref Temp_dataGridView, false);
+            SaveDataGrid(path + "LitePlacer.NeedleFunctions", Temp_dataGridView);
+
+            DataGridViewCopy(UpCamComponents_dataGridView, ref Temp_dataGridView, false);
+            SaveDataGrid(path + "LitePlacer.UpCamComponentsFunctions", Temp_dataGridView);
+
+            DataGridViewCopy(UpcamSnapshot_dataGridView, ref Temp_dataGridView, false);
+            SaveDataGrid(path + "LitePlacer.UpCamSnapshotFunctions", Temp_dataGridView);
 
             if (Cnc.Connected)
             {
@@ -477,14 +518,152 @@ namespace LitePlacer
         // =================================================================================
         // Saving and restoring data tables (Note: Not job files)
         // =================================================================================
+
+        // Reading ver2 format allows changing the data grid itself at a software update, 
+        // adding and removing columns, and still read in a saved file from previous software version.
+
+        private int Ver2FormatID = 20000001;
+        public bool LoadingDataGrid = false;  // to avoid problems with cell value changed event and unfilled grids
+
+
+        public void LoadDataGrid(string FileName, DataGridView dgv)
+        {
+            try
+            {
+                bool Ver2 = false;
+                LoadingDataGrid = true;
+                int first;
+
+                // Does version 2 files exist?
+                Ver2 = (File.Exists(FileName+"_v2"));
+                if(Ver2)
+                {
+                    FileName = FileName + "_v2";
+                }
+
+                if (!File.Exists(FileName))
+                {
+                    return;
+                }
+                
+                using (BinaryReader br = new BinaryReader(File.Open(FileName, FileMode.Open)))
+                {
+                    dgv.Rows.Clear();
+                    if (Ver2)
+                    {
+                        DisplayText("Reading v2 format file " + FileName);
+                        first = br.ReadInt32();
+                    }
+                    else
+                    {
+                        DisplayText("Reading v1 format file " + FileName);
+                    }
+
+                    int cols = br.ReadInt32();
+                    int rows = br.ReadInt32();
+
+                    if (dgv.AllowUserToAddRows)
+                    {
+                        // There is an empty row in the bottom that is visible for manual add.
+                        // It is saved in the file. It is automatically added, so we don't want to add it again.
+                        rows = rows - 1;
+                    }
+                    // read headers;
+                    List<string> Headers = new List<string>();
+
+                    if (Ver2)
+	                {
+                        for (int j = 0; j < cols; ++j)
+                        {
+                            Headers.Add(br.ReadString());
+                        }
+	                }
+                    else
+                    {
+                        Headers = Addv1Headers(FileName);
+                    }
+
+                    // read data
+                    int i_out;
+                    for (int i = 0; i < rows; ++i)
+                    {
+                        dgv.Rows.Add();
+                        for (int j = 0; j < cols; ++j)
+                        {
+                            if (MapHeaders(dgv, Headers, j, out i_out))
+                            {
+                                if (br.ReadBoolean())
+                                {
+                                    dgv.Rows[i].Cells[i_out].Value = br.ReadString();
+                                }
+                                else br.ReadBoolean();
+                                //if ((dgv.Rows[i].Cells[i_out].Value == null) && (dgv.Rows[i].Cells[i_out].ValueType == typeof(DataGridViewTextBoxColumn)))
+                                //{
+                                //    dgv.Rows[i].Cells[i_out].Value = "--";
+                                //}
+                                //if (dgv.Rows[i].Cells[i_out].Value.ToString() == "")
+                                //{
+                                //    dgv.Rows[i].Cells[i_out].Value = "--";
+                                //}
+                            }
+                            else
+                            {
+                                // column is removed: dummy read, discard the data
+                                if (br.ReadBoolean())
+                                {
+                                    br.ReadString();
+                                }
+                                else br.ReadBoolean();
+                            }
+                        }
+                    }
+                }
+                LoadingDataGrid = false;
+            }
+            catch (System.Exception excep)
+            {
+                MessageBox.Show(excep.Message);
+                LoadingDataGrid = false;
+            }
+        }
+
+        private bool MapHeaders(DataGridView Grid, List<string> Headers, int i_in, out int i_out)
+        {
+            // i_in= column index of the read-in data
+            // sets i_out to the column index of the currect header in Grid
+            // returns if match was found
+            i_out = -1;
+            string label = Headers[i_in];
+            for (int i = 0; i < Grid.Columns.Count; i++)
+            {
+                if (Grid.Columns[i].Name == label)
+                {
+                    i_out = i;
+                    return true;
+                }
+            }
+            return false;
+        }
+
+
+
         public void SaveDataGrid(string FileName, DataGridView dgv)
         {
             try
             {
-                using (BinaryWriter bw = new BinaryWriter(File.Open(FileName, FileMode.Create)))
+                using (BinaryWriter bw = new BinaryWriter(File.Open(FileName+"_v2", FileMode.Create)))
                 {
+                    bw.Write(Ver2FormatID);
                     bw.Write(dgv.Columns.Count);
                     bw.Write(dgv.Rows.Count);
+                    LoadingDataGrid = false;
+
+                    // write headers
+                    foreach (DataGridViewColumn column in dgv.Columns)
+                    {
+                        bw.Write(column.Name);
+                    }
+
                     foreach (DataGridViewRow dgvR in dgv.Rows)
                     {
                         for (int j = 0; j < dgv.Columns.Count; ++j)
@@ -510,9 +689,84 @@ namespace LitePlacer
             }
         }
 
-        public bool LoadindDataGrid = false;  // to avoid problems with cell value changed event and unfilled grids
+        // =================================================================================
+        // To be able to change columns and read in old format data file, we need to manually set the old
+        // format headers, since I didn't have the insight to write them to the file forom beginning.
+        // this routine does it, called from LoadDataGrid()
 
-        public void LoadDataGrid(string FileName, DataGridView dgv)
+        public List<string> Addv1Headers(string filename)
+        {
+            List<string> Headers = new List<string>();
+            int dot = filename.LastIndexOf('.');
+            string filetype = filename.Substring(dot);
+
+            switch (filetype)
+            {
+                case ".TapesData":
+                    Headers.Add("SelectButtonColumn");
+                    Headers.Add("IdColumn");
+                    Headers.Add("OrientationColumn");
+                    Headers.Add("RotationColumn");
+                    Headers.Add("WidthColumn");
+                    Headers.Add("TypeColumn");
+                    Headers.Add("Next_Column");
+                    Headers.Add("Tray_Column");
+                    Headers.Add("X_Column");
+                    Headers.Add("Y_Column");
+                    Headers.Add("PickupZ_Column");
+                    Headers.Add("PlaceZ_Column");
+                    Headers.Add("NextX_Column");
+                    Headers.Add("NextY_column");
+                break;
+
+                case ".CustomTapes":
+                    Headers.Add("Name_Column");
+                    Headers.Add("PitchColumn");
+                    Headers.Add("UsesLocationMarks_Column");
+                    Headers.Add("PartOffsetX_Column");
+                    Headers.Add("PartOffsetY_Column");
+                break;
+
+                case ".ComponentData":
+                    Headers.Add("PartialName_column");
+                    Headers.Add("SizeX_column");
+                    Headers.Add("SizeY_column");
+                break;
+
+                case ".HomingFunctions":
+                case ".FiducialsFunctions":
+                case ".ComponentsFunctions":
+                case ".PaperTapeFunctions":
+                case ".BlackTapeFunctions":
+                case ".ClearTapeFunctions":
+                case ".SnapshotFunctions":
+                case ".NeedleFunctions":
+                case ".UpCamComponentsFunctions":
+                case ".UpCamSnapshotFunctions":
+                    Headers.Add("Funct_column");
+                    Headers.Add("Enabled_column");
+                    Headers.Add("Int1_column");
+                    Headers.Add("Double1_column");
+                    Headers.Add("R_column");
+                    Headers.Add("G_column");
+                    Headers.Add("B_column");
+                break;
+
+
+                default:
+                    ShowMessageBox(
+                        "*** Header description for " + filetype + " file missing. Programmer's error. ***",
+                        "Sloppy programmer",
+                        MessageBoxButtons.OK);
+                break;
+            }
+
+            return Headers;
+        }
+
+        // =================================================================================
+        // This routine reads in old format file
+        public void LoadDataGrid_V1(string FileName, DataGridView dgv)
         {
             try
             {
@@ -520,7 +774,7 @@ namespace LitePlacer
                 {
                     return;
                 }
-                LoadindDataGrid = true;
+                LoadingDataGrid = true;
                 dgv.Rows.Clear();
                 using (BinaryReader bw = new BinaryReader(File.Open(FileName, FileMode.Open)))
                 {
@@ -546,15 +800,23 @@ namespace LitePlacer
                                 dgv.Rows[i].Cells[j].Value = debug;
                             }
                             else bw.ReadBoolean();
+                            if (dgv.Rows[i].Cells[j].Value == null)
+                            {
+                                dgv.Rows[i].Cells[j].Value = "--";
+                            }
+                            if (dgv.Rows[i].Cells[j].Value.ToString() == "")
+                            {
+                                dgv.Rows[i].Cells[j].Value = "--";
+                            }
                         }
                     }
                 }
-                LoadindDataGrid = false;
+                LoadingDataGrid = false;
             }
             catch (System.Exception excep)
             {
                 MessageBox.Show(excep.Message);
-                LoadindDataGrid = false;
+                LoadingDataGrid = false;
             }
         }
 
@@ -1258,7 +1520,7 @@ namespace LitePlacer
             double MarkA = Cnc.CurrentA;
 
             bool UpCamWasRunning = false;
-            if (UpCamera.IsRunning())
+            if (UpCamera.Active)
             {
                 UpCamWasRunning = true;
             }
@@ -8189,22 +8451,22 @@ namespace LitePlacer
 
             foreach (DataGridViewRow SizeRow in ComponentData_dataGridView.Rows)
             {
-                if (SizeRow.Cells["PartialName"].Value != null)
+                if (SizeRow.Cells["PartialName_column"].Value != null)
                 {
-                    if (FootPrint.Contains(SizeRow.Cells["PartialName"].Value.ToString()))
+                    if (FootPrint.Contains(SizeRow.Cells["PartialName_column"].Value.ToString()))
                     {
-                        if (!double.TryParse(SizeRow.Cells["SizeX"].Value.ToString(), out sizeX))
+                        if (!double.TryParse(SizeRow.Cells["SizeX_column"].Value.ToString(), out sizeX))
                         {
                             ShowMessageBox(
-                                "Bad data at " + SizeRow.Cells["PartialName"].Value.ToString() + ", SizeX",
+                                "Bad data at " + SizeRow.Cells["PartialName_column"].Value.ToString() + ", SizeX",
                                 "Sloppy programmer error",
                                 MessageBoxButtons.OK);
                             return false;
                         }
-                        if (!double.TryParse(SizeRow.Cells["SizeY"].Value.ToString(), out sizeY))
+                        if (!double.TryParse(SizeRow.Cells["SizeY_column"].Value.ToString(), out sizeY))
                         {
                             ShowMessageBox(
-                                "Bad data at " + SizeRow.Cells["PartialName"].Value.ToString() + ", SizeY",
+                                "Bad data at " + SizeRow.Cells["PartialName_column"].Value.ToString() + ", SizeY",
                                 "Sloppy programmer error",
                                 MessageBoxButtons.OK);
                             return false;
@@ -9112,6 +9374,7 @@ namespace LitePlacer
             if (TapesAll_openFileDialog.ShowDialog() == DialogResult.OK)
             {
                 LoadDataGrid(TapesAll_openFileDialog.FileName, Tapes_dataGridView);
+                Tapes.AddWidthValues();
             }
         }
 
@@ -9119,11 +9382,14 @@ namespace LitePlacer
         {
             int PartNum = 0;
             int TapeNum = 0;
+            DataGridViewRow Row = Tapes_dataGridView.Rows[Tapes_dataGridView.CurrentCell.RowIndex];
             if (!int.TryParse(HoleTest_maskedTextBox.Text, out PartNum))
             {
-                return;
+                if (!int.TryParse(Row.Cells["Next_Column"].Value.ToString(), out PartNum))
+                {
+                    return;
+                }
             }
-            DataGridViewRow Row = Tapes_dataGridView.Rows[Tapes_dataGridView.CurrentCell.RowIndex];
             string Id = Row.Cells["IdColumn"].Value.ToString();
             double X = 0.0;
             double Y = 0.0;
@@ -9141,11 +9407,14 @@ namespace LitePlacer
         {
             int PartNum = 0;
             int TapeNum = 0;
+            DataGridViewRow Row = Tapes_dataGridView.Rows[Tapes_dataGridView.CurrentCell.RowIndex];
             if (!int.TryParse(HoleTest_maskedTextBox.Text, out PartNum))
             {
-                return;
+                if (!int.TryParse(Row.Cells["Next_Column"].Value.ToString(), out PartNum))
+                {
+                    return;
+                }
             }
-            DataGridViewRow Row = Tapes_dataGridView.Rows[Tapes_dataGridView.CurrentCell.RowIndex];
             string Id = Row.Cells["IdColumn"].Value.ToString();
             double X = 0.0;
             double Y = 0.0;
@@ -9556,8 +9825,8 @@ namespace LitePlacer
                 {
                     foreach (DataGridViewRow Row in ToGr.Rows)
                     {
-                        DebugStr += Row.Cells[0].Value.ToString() + "( ";
-                        for (int i = 1; i < Row.Cells.Count; i++)
+                        DebugStr += "( ";
+                        for (int i = 0; i < Row.Cells.Count; i++)
                         {
                             if (Row.Cells[i].Value == null)
                             {
@@ -10811,7 +11080,7 @@ namespace LitePlacer
         // fix #22 calculate new next coordinates if column was changed
         private void Tapes_dataGridView_CellValueChanged(object sender, DataGridViewCellEventArgs e)
         {
-            if (StartingUp || LoadindDataGrid)
+            if (StartingUp || LoadingDataGrid)
             {
                 return;
             }
